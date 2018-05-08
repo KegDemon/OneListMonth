@@ -1,0 +1,24 @@
+{
+  "name": "onelistmonth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "run": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "MSK",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "btoa": "^1.2.1",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "lodash": "^4.17.10",
+    "memory-cache": "^0.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.3"
+  }
+}
