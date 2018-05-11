@@ -13,10 +13,12 @@
   "dependencies": {
     "axios": "^0.18.0",
     "btoa": "^1.2.1",
+    "cookie-parser": "^1.4.3",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "lodash": "^4.17.10",
-    "memory-cache": "^0.2.0"
+    "memory-cache": "^0.2.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "nodemon": "^1.17.3"
