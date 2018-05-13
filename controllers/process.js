@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 const ProcessController = async request => {
     const seeds = _.get(request, 'body.artists', false);
-    const countryCode = request.cookies[process.env.COOKIE_COUNTRY_CODE];
+    const countryCode = request.cookies[process.env.COOKIE_COUNTRY_NAME] || 'US';
 
     return seeds && seeds.length > 1 ? makeRequest(seeds, countryCode) : {};
 }
@@ -18,7 +18,7 @@ async function makeRequest(seeds, countryCode) {
 
     const getTopTracks = await _requestBatchArtists(artistsTrackCollection);
     const getTrackStyleInformation = await _requestBatchTrackStyles(getTopTracks);
-    const getRecommendations = await _requestRecommendationsFromVitals(getTopTracks, _processVitals(getTrackStyleInformation));
+    const getRecommendations = await _requestRecommendationsFromVitals(getTopTracks, _processVitals(getTrackStyleInformation), countryCode);
 
     return _processFinalTrackList(getRecommendations);
 }
@@ -45,11 +45,11 @@ async function _requestBatchTrackStyles(tracksCollection) {
         .then((r) => _.get(r, 'data.audio_features', {}), (e) => e.error);
 }
 
-async function _requestRecommendationsFromVitals(topTracks, recommendationModel) {
+async function _requestRecommendationsFromVitals(topTracks, recommendationModel, countryCode) {
     const req = Request({
         params: {
             limit: 100,
-            market: 'US',
+            market: countryCode,
             seed_tracks: _.sampleSize(topTracks, 5).join(','),
             ...recommendationModel
         }
@@ -96,7 +96,7 @@ async function _processVitals(tracksVitals) {
 }
 
 async function _processFinalTrackList(recommendations) {
-    return await _.chain(recommendations)
+    return await !recommendations ? {} : _.chain(recommendations)
         .get('tracks', [])
         .reduce((res, track) => {
             res.push({
