@@ -3,12 +3,13 @@ const _ = require('lodash');
 
 const ProcessController = async request => {
     const seeds = _.get(request, 'body.artists', false);
+    const countryCode = request.cookies[process.env.COOKIE_COUNTRY_CODE];
 
-    return seeds && seeds.length > 1 ? makeRequest(seeds) : {};
+    return seeds && seeds.length > 1 ? makeRequest(seeds, countryCode) : {};
 }
 
-async function makeRequest(seeds) {
-    const req = Request({params: {country: 'US'}});
+async function makeRequest(seeds, countryCode) {
+    const req = Request({params: {country: countryCode}});
     const artistSeedInformation = seeds.map((artist) => 
         req(`/artists/${artist}/top-tracks`).then((r) => r.data, (e) => e.error)
     , []);

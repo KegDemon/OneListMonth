@@ -17,7 +17,7 @@ router.get('/login', (req, res, next) => {
   const stateRequest = uuid();
   res.cookie(process.env.COOKIE_XSRF_NAME, stateRequest, { maxAge: 1000 * 60 });
 
-  res.redirect(`${process.env.SPOTIFY_LOGIN_PATH}?client_id=${process.env.CLIENT_ID}&response_type=token&scope=playlist-modify-public&state=${stateRequest}&redirect_uri=${encodeURIComponent(process.env.REDIRECT_URL)}`)
+  res.redirect(`${process.env.SPOTIFY_LOGIN_PATH}?client_id=${process.env.CLIENT_ID}&response_type=token&scope=playlist-modify-public%20user-read-private&state=${stateRequest}&redirect_uri=${encodeURIComponent(process.env.REDIRECT_URL)}`)
 });
 
 router.get('/auth', (req, res, next) => {
@@ -47,7 +47,8 @@ router.get('/loggedin', (req, res) => {
 router.get('/user', (req, res) => {
   const uToken = req.cookies[process.env.COOKIE_LOGIN_NAME];
   const uCookie = req.cookies[process.env.COOKIE_UID_NAME];
-  if (!uToken || uCookie) {
+  const uCountry = req.cookies[process.env.COOKIE_COUNTRY_NAME];
+  if (!uToken || uCookie || uCountry) {
     res.redirect('/');
     return;
   }
@@ -59,6 +60,7 @@ router.get('/user', (req, res) => {
   })
   .then((r) => {
     res.cookie(process.env.COOKIE_UID_NAME, r.data.id, userCookieOpts)
+    res.cookie(process.env.COOKIE_COUNTRY_NAME, r.data.country, userCookieOpts)
 
     res.redirect('/');
   }, (e) => e.error);
