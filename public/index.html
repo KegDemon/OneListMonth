@@ -36,18 +36,19 @@
                   <v-card-text>
 
                     <v-text-field
-                      autofocus
+                      :disabled="searchingArtist"
                       append-icon="search"
+                      autofocus
+                      clearable
                       hint="Start typing to search for an artist"
                       placeholder="Search for an artist"
                       type="text"
-                      :disabled="searchingArtist"
                       v-model="searchTerm"
                     >
                       <v-progress-linear
-                        v-if="searchingArtist"
-                        slot="progress"
                         height="7"
+                        slot="progress"
+                        v-if="searchingArtist"
                       ></v-progress-linear> 
                     </v-text-field>
 
@@ -89,11 +90,11 @@
 
                   <v-dialog scrollable v-model="playlistDialog">
                     <v-btn
-                      slot="activator"
+                      :disabled="selectedArtists.length > 5 || selectedArtists.length < 2"  
+                      @click="generatePlaylist();"
                       color="primary"
                       dark
-                      @click="generatePlaylist();"
-                      :disabled="selectedArtists.length > 5 || selectedArtists.length < 2"  
+                      slot="activator"
                     >Generate Playlist</v-btn>
                     <v-card v-if="loadingPlaylist" width="280px">
                       <v-card-title>
