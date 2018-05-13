@@ -12,7 +12,12 @@ app.use(cookies());
 
 app.use('/', routes.webRoutes);
 
-app.use('/api', middlewear.tokenRefresh, routes.apiRoutes);
+app.use(
+    '/api',
+    middlewear.cors,
+    middlewear.tokenRefresh, 
+    routes.apiRoutes
+);
 
 app.use(express.static('public'));
 

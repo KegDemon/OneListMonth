@@ -1,3 +1,4 @@
 exports.browse = require('./browse');
-exports.search = require('./search');
+exports.playlist = require('./playlist');
 exports.process = require('./process');
+exports.search = require('./search');

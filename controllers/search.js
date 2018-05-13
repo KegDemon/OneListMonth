@@ -12,12 +12,12 @@ async function makeRequest(input) {
         params: {
             q: input,
             type: 'artist',
-            limit: 10
+            limit: 15
         },
     });
 
     return await req('/search')
-        .then((r) => r.data, (e) => {
+        .then((r) => _(r, 'data.artists.items', []), (e) => {
             return {error: 'Something went way wrong :('};
         });
 }

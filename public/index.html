@@ -1,6 +1,157 @@
 <html>
-    <head></head>
-    <body>
-        
-    </body>
+
+  <head>
+    <base href="." />
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  </head>
+
+  <body>
+    <div id="app">
+      <v-app dark>
+        <v-content>
+          <v-container fluid>
+            <v-layout align-center justify-center v-if="!isLoggedIn">
+              <v-flex xs12 sm8 md6>
+                <v-card class="elevation-12">
+                  <v-toolbar dark color="primary">
+                    <v-toolbar-title>OneListMonth Login</v-toolbar-title>
+                  </v-toolbar>
+                  <v-card-text>
+                    <v-subheader>Looks like you need to login here with Spotify before you can continue.</v-subheader>
+
+                    <v-btn color="success" dark href="login">Spotify Login</v-btn>
+                  </v-card-text>
+                </v-card>
+              </v-flex>
+            </v-layout>
+            <v-layout justify-center v-else>
+              <v-flex xs12 sm8 md6>
+                <v-card class="elevation-12">
+                  <v-toolbar dark color="primary">
+                    <v-toolbar-title>OneListMonth</v-toolbar-title>
+                  </v-toolbar>
+
+                  <v-card-text>
+
+                    <v-text-field
+                      autofocus
+                      append-icon="search"
+                      hint="Start typing to search for an artist"
+                      placeholder="Search for an artist"
+                      type="text"
+                      :disabled="searchingArtist"
+                      v-model="searchTerm"
+                    >
+                      <v-progress-linear
+                        v-if="searchingArtist"
+                        slot="progress"
+                        height="7"
+                      ></v-progress-linear> 
+                    </v-text-field>
+
+                  </v-card-text>
+
+                  <v-subheader v-if="artistResults.length">Search Results: {{ artistResults.length }}</v-subheader>
+                  <v-list dark v-if="artistResults.length">
+                    <template v-for="(artist, index) in artistResults">
+                      <v-list-tile avatar>
+                        <v-list-tile-avatar>
+                          <img v-if="artist.images.length" :src="artist.images[artist.images.length - 1].url">
+                        </v-list-tile-avatar>
+                        <v-list-tile-content>
+                          <v-list-tile-title v-html="artist.name"></v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-action>
+                          <v-checkbox :value="artist" v-model="selectedArtists"></v-checkbox>
+                        </v-list-tile-action>
+                      </v-list-tile>
+                    </template>
+                  </v-list>
+
+                  <v-subheader v-if="selectedArtists.length">Selected Artists: {{ selectedArtists.length }}</v-subheader>
+                  <v-list dark v-if="selectedArtists.length">
+                    <template v-for="(artist, index) in selectedArtists">
+                      <v-list-tile avatar>
+                        <v-list-tile-avatar>
+                          <img v-if="artist.images.length" :src="artist.images[artist.images.length - 1].url">
+                        </v-list-tile-avatar>
+                        <v-list-tile-content>
+                          <v-list-tile-title v-html="artist.name"></v-list-tile-title>
+                        </v-list-tile-content>
+                        <v-list-tile-action>
+                          <v-checkbox :value="artist" v-model="selectedArtists"></v-checkbox>
+                        </v-list-tile-action>
+                      </v-list-tile>
+                    </template>
+                  </v-list>
+
+                  <v-dialog scrollable v-model="playlistDialog">
+                    <v-btn
+                      slot="activator"
+                      color="primary"
+                      dark
+                      @click="generatePlaylist();"
+                      :disabled="selectedArtists.length > 5 || selectedArtists.length < 2"  
+                    >Generate Playlist</v-btn>
+                    <v-card v-if="loadingPlaylist" width="280px">
+                      <v-card-title>
+                        <v-layout justify-center>
+                          Generating your playlist now...
+                        </v-layout>
+                      </v-card-title>
+                      <v-card-text>
+                        <v-layout align-center justify-center>
+                          <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
+                        </v-layout>
+                      </v-card-text>
+                    </v-card>
+                    <v-card v-else>
+                      <v-card-title>
+                        Your Playlist:
+                      </v-card-title>
+                      
+                      <v-divider></v-divider>
+
+                      <v-card-text>
+                        <v-list dark two-line v-if="generatedPlaylist.length">
+                          <template v-for="(info, index) in generatedPlaylist">
+                            <v-list-tile avatar>
+                              <v-list-tile-avatar>
+                                <img v-if="info.trackImage" :src="info.trackImage">
+                              </v-list-tile-avatar>
+                              <v-list-tile-content>
+                                <v-list-tile-title v-html="info.trackTitle"></v-list-tile-title>
+                                <v-list-tile-sub-title v-html="info.trackArtist"></v-list-tile-sub-title>
+                              </v-list-tile-content>
+                            </v-list-tile>
+                          </template>
+                        </v-list>
+                        <span v-else>No results found</span>
+                      </v-card-text>
+
+                      <v-divider></v-divider>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" flat @click.native="playlistDialog = false">Close</v-btn>
+                        <v-btn color="blue darken-1" flat @click.native="playlistDialog = false; savePlaylist();">Save</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-card> 
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-content>
+      </v-app>
+    </div>
+
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js" integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous"></script>
+    <script src="./index.js"></script>
+  </body>
+
 </html>

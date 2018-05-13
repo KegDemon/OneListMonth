@@ -22,4 +22,9 @@ router.post('/process', (req, res) => {
         .then(r => res.json(r));
 });
 
+router.post('/playlist', (req, res) => {
+    ctrl.playlist(req)
+        .then(r => res.json(r));
+})
+
 module.exports = router;

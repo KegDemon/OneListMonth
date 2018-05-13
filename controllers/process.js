@@ -98,7 +98,12 @@ async function _processFinalTrackList(recommendations) {
     return await _.chain(recommendations)
         .get('tracks', [])
         .reduce((res, track) => {
-            res.push(track.uri);
+            res.push({
+                trackImage: track.album.images[track.album.images.length - 1].url,
+                trackUri: track.uri,
+                trackTitle: track.name,
+                trackArtist: track.artists.map((artist) => artist.name).join(', '),
+            });
 
             return res;
         }, [])
