@@ -19,24 +19,25 @@ const Request = (params) => axios.create({
 
 const PlaylistController = async request => {
   const _playlist = _.get(request, 'body.playlist', void 0);
+  const _seedArtists = _.get(request, 'body.seedArtists', void 0);
 
   _uid = request.cookies[env.COOKIE_UID_NAME];
   _utoken = request.cookies[env.COOKIE_LOGIN_NAME];
 
-  if (!_playlist || !_uid || !_utoken) return await {data: 'error'};
+  if (!_playlist || !_seedArtists || !_uid || !_utoken) return await {data: 'error'};
 
   const _trackIds = _playlist.map((track) => track.trackUri);
 
-  const _newCreatedPlaylistId = await _putPlaylist();
+  const _newCreatedPlaylistId = await _putPlaylist(_seedArtists);
 
   return await _putPlaylistItems(_newCreatedPlaylistId, _trackIds);
 }
 
-async function _putPlaylist() {
+async function _putPlaylist(seedArtists) {
   const req = Request({
     data: {
-      name: `OneListMonth - ${new Date()}`,
-      description: 'Created with OneListMonth'
+      name: `OneListMonth - ${seedArtists}`,
+      description: `Created with OneListMonth on ${new Date()}`
     }
   });
 
@@ -51,7 +52,7 @@ async function _putPlaylistItems(playlistId, trackIds) {
   if (playlistId < 0) {
     return await {data: "Error creating playlist"};
   }
-  
+
   const req = Request({
     data: {
       uris: trackIds

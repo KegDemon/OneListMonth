@@ -58,7 +58,14 @@ new Vue({
       });
     },
     savePlaylist () {
-      axios.post('api/playlist', {playlist: this.generatedPlaylist});
+      axios.post('api/playlist',
+        {
+          playlist: this.generatedPlaylist,
+          seedArtists: this.selectedArtists
+            .map((artist) => artist.name)
+            .join(', '),
+        }
+      );
     },
     artistLookup (val) {
       this.searchingArtist = true;
