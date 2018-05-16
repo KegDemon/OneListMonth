@@ -15,7 +15,7 @@ const userCookieOpts = {
 
 router.get('/login', (req, res, next) => {
   const stateRequest = uuid();
-  res.cookie(process.env.COOKIE_XSRF_NAME, stateRequest, { maxAge: 1000 * 60 });
+  res.cookie(process.env.COOKIE_XSRF_NAME, stateRequest, { maxAge: 1000 * 60 * process.env.COOKIE_XSRF_TIMEOUT });
 
   res.redirect(`${process.env.SPOTIFY_LOGIN_PATH}?client_id=${process.env.CLIENT_ID}&response_type=token&scope=playlist-modify-public%20user-read-private&state=${stateRequest}&redirect_uri=${encodeURIComponent(process.env.REDIRECT_URL)}`)
 });
