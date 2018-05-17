@@ -5,13 +5,13 @@ const axios = require('axios');
 const cache = require('memory-cache');
 
 const Request = (params) => {
-    return axios.create({
-        baseURL: BASE_PATH,
-        headers: {
-            Authorization: `Bearer ${cache.get('token')}`
-        },
-        ...params
-    });
+  return axios.create({
+    baseURL: BASE_PATH,
+    headers: {
+      Authorization: `Bearer ${cache.get('token')}`
+    },
+    ...params
+  });
 };
 
 module.exports = Request;

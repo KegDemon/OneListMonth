@@ -13,14 +13,14 @@ app.use(cookies());
 app.use('/', routes.webRoutes);
 
 app.use(
-    '/api',
-    middlewear.cors,
-    middlewear.tokenRefresh, 
-    routes.apiRoutes
+  '/api',
+  middlewear.cors,
+  middlewear.tokenRefresh,
+  routes.apiRoutes
 );
 
 app.use(express.static('public'));
 
 app.listen(port, () => {
-    console.log('Booting up...');
+  console.log('Booting up...');
 });
