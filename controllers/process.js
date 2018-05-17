@@ -100,7 +100,7 @@ async function _processFinalTrackList(recommendations) {
         .get('tracks', [])
         .reduce((res, track) => {
             res.push({
-                trackImage: track.album.images[track.album.images.length - 1].url,
+                trackImage: _.get(track.album, `images[${track.album.images.length - 1}].url`, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII='),
                 trackUri: track.uri,
                 trackTitle: track.name,
                 trackArtist: track.artists.map((artist) => artist.name).join(', '),

@@ -14,135 +14,157 @@
           <v-container fluid>
             <v-layout align-center justify-center v-if="!isLoggedIn">
               <v-flex xs12 sm8 md6>
-                <v-card class="elevation-12">
+                <v-card class="elevation-8">
                   <v-toolbar dark color="primary">
                     <v-toolbar-title>OneListMonth Login</v-toolbar-title>
                   </v-toolbar>
                   <v-card-text>
                     <v-subheader>Looks like you need to login here with Spotify before you can continue.</v-subheader>
 
-                    <v-btn color="success" dark href="login">Spotify Login</v-btn>
+                    <v-layout justify-end>
+                      <v-btn color="success" dark href="login">Spotify Login</v-btn>
+                    </v-layout>
                   </v-card-text>
                 </v-card>
               </v-flex>
             </v-layout>
-            <v-layout justify-center v-else>
-              <v-flex xs12 sm8 md6>
-                <v-card class="elevation-12">
-                  <v-toolbar dark color="primary">
-                    <v-toolbar-title>OneListMonth</v-toolbar-title>
-                  </v-toolbar>
 
-                  <v-card-text>
+            <v-layout v-else>
+              <v-toolbar color="primary" dark app absolute>
+                <span class="display-1 ml-3 mr-5">OneListMonth</span>
+              </v-toolbar>
 
-                    <v-text-field
-                      :disabled="searchingArtist"
-                      append-icon="search"
-                      autofocus
-                      clearable
-                      hint="Start typing to search for an artist"
-                      placeholder="Search for an artist"
-                      type="text"
-                      v-model="searchTerm"
-                    >
-                      <v-progress-linear
-                        height="7"
-                        slot="progress"
-                        v-if="searchingArtist"
-                      ></v-progress-linear> 
-                    </v-text-field>
-
-                  </v-card-text>
-
-                  <v-subheader v-if="artistResults.length">Search Results: {{ artistResults.length }}</v-subheader>
-                  <v-list dark v-if="artistResults.length">
-                    <template v-for="(artist, index) in artistResults">
-                      <v-list-tile avatar>
-                        <v-list-tile-avatar>
-                          <img v-if="artist.images.length" :src="artist.images[artist.images.length - 1].url">
-                        </v-list-tile-avatar>
-                        <v-list-tile-content>
-                          <v-list-tile-title v-html="artist.name"></v-list-tile-title>
-                        </v-list-tile-content>
-                        <v-list-tile-action>
-                          <v-checkbox :value="artist" v-model="selectedArtists"></v-checkbox>
-                        </v-list-tile-action>
-                      </v-list-tile>
-                    </template>
-                  </v-list>
-
-                  <v-subheader v-if="selectedArtists.length">Selected Artists: {{ selectedArtists.length }}</v-subheader>
-                  <v-list dark v-if="selectedArtists.length">
-                    <template v-for="(artist, index) in selectedArtists">
-                      <v-list-tile avatar>
-                        <v-list-tile-avatar>
-                          <img v-if="artist.images.length" :src="artist.images[artist.images.length - 1].url">
-                        </v-list-tile-avatar>
-                        <v-list-tile-content>
-                          <v-list-tile-title v-html="artist.name"></v-list-tile-title>
-                        </v-list-tile-content>
-                        <v-list-tile-action>
-                          <v-checkbox :value="artist" v-model="selectedArtists"></v-checkbox>
-                        </v-list-tile-action>
-                      </v-list-tile>
-                    </template>
-                  </v-list>
-
-                  <v-dialog scrollable v-model="playlistDialog">
-                    <v-btn
-                      :disabled="selectedArtists.length > 5 || selectedArtists.length < 2"  
-                      @click="generatePlaylist();"
-                      color="primary"
-                      dark
-                      slot="activator"
-                    >Generate Playlist</v-btn>
-                    <v-card v-if="loadingPlaylist" width="280px">
-                      <v-card-title>
-                        <v-layout justify-center>
-                          Generating your playlist now...
-                        </v-layout>
-                      </v-card-title>
+              <v-container v-bind="{ ['grid-list-lg']: true }">
+                <v-layout row wrap>
+                  <v-flex xs12 sm6>
+                    <v-card class="elevation-8">
+                      <v-toolbar color="primary" dark>
+                        <span class="title ml-3 mr-5">Search Artists</span>
+                      </v-toolbar>
                       <v-card-text>
-                        <v-layout align-center justify-center>
-                          <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
-                        </v-layout>
+
+                        <v-text-field
+                          :loading="searchingArtist"
+                          append-icon="search"
+                          autocapitalize="off"
+                          autocomplete="off"
+                          autocorrect="off"
+                          autofocus
+                          clearable
+                          hint="Start typing to search for an artist"
+                          placeholder="Search for an artist"
+                          spellcheck="false"
+                          type="text"
+                          v-model="searchTerm"
+                        ></v-text-field>
+
                       </v-card-text>
-                    </v-card>
-                    <v-card v-else>
-                      <v-card-title>
-                        Your Playlist:
-                      </v-card-title>
-                      
-                      <v-divider></v-divider>
 
+                      <v-subheader v-if="artistResults.length">Search Results: {{ artistResults.length }}</v-subheader>
+                      <v-list dark v-if="artistResults.length">
+                        <template v-for="(artist, index) in artistResults">
+                          <v-list-tile avatar>
+                            <v-list-tile-avatar>
+                              <img v-if="artist.images.length" :src="artist.images[artist.images.length - 1].url">
+                            </v-list-tile-avatar>
+                            <v-list-tile-content>
+                              <v-list-tile-title v-html="artist.name"></v-list-tile-title>
+                            </v-list-tile-content>
+                            <v-list-tile-action>
+                              <v-checkbox :value="artist" v-model="selectedArtists"></v-checkbox>
+                            </v-list-tile-action>
+                          </v-list-tile>
+                        </template>
+                      </v-list>
+                    </v-card>
+                  </v-flex>
+
+                  <v-flex xs12 sm6>
+                    <v-card class="elevation-8">
+                      <v-toolbar color="primary" dark>
+                        <span class="title ml-3 mr-5">Selected Artists: {{ selectedArtists.length }}</span>
+                      </v-toolbar>
                       <v-card-text>
-                        <v-list dark two-line v-if="generatedPlaylist.length">
-                          <template v-for="(info, index) in generatedPlaylist">
+                        <v-subheader v-if="!selectedArtists.length">You haven't selected any artists yet. Search for an artist to get started.</v-subheader>
+                        <v-list dark v-if="selectedArtists.length">
+                          <template v-for="(artist, index) in selectedArtists">
                             <v-list-tile avatar>
                               <v-list-tile-avatar>
-                                <img v-if="info.trackImage" :src="info.trackImage">
+                                <img v-if="artist.images.length" :src="artist.images[artist.images.length - 1].url">
                               </v-list-tile-avatar>
                               <v-list-tile-content>
-                                <v-list-tile-title v-html="info.trackTitle"></v-list-tile-title>
-                                <v-list-tile-sub-title v-html="info.trackArtist"></v-list-tile-sub-title>
+                                <v-list-tile-title v-html="artist.name"></v-list-tile-title>
                               </v-list-tile-content>
+                              <v-list-tile-action>
+                                <v-checkbox :value="artist" v-model="selectedArtists"></v-checkbox>
+                              </v-list-tile-action>
                             </v-list-tile>
                           </template>
                         </v-list>
-                        <span v-else>No results found</span>
+
+                        <v-layout justify-end>
+                          <v-dialog scrollable v-model="playlistDialog" :max-width=" loadingPlaylist ? '280' : '680'">
+                            <v-btn
+                              :disabled="selectedArtists.length > 5 || selectedArtists.length < 2"
+                              @click="generatePlaylist();"
+                              color="primary"
+                              dark
+                              slot="activator"
+                            >Generate Playlist</v-btn>
+
+                            <v-card v-if="loadingPlaylist">
+                              <v-card-title>
+                                <v-layout justify-center>
+                                  Generating your playlist now...
+                                </v-layout>
+                              </v-card-title>
+                              <v-card-text>
+                                <v-layout align-center justify-center>
+                                  <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
+                                </v-layout>
+                              </v-card-text>
+                            </v-card>
+                            <v-card v-else>
+                              <v-card-title>
+                                Your Playlist:
+                              </v-card-title>
+
+                              <v-divider></v-divider>
+
+                              <v-card-text>
+                                <v-list dark two-line v-if="generatedPlaylist.length">
+                                  <template v-for="(info, index) in generatedPlaylist">
+                                    <v-list-tile avatar>
+                                      <v-list-tile-avatar>
+                                        <img v-if="info.trackImage" :src="info.trackImage">
+                                      </v-list-tile-avatar>
+                                      <v-list-tile-content>
+                                        <v-list-tile-title v-html="info.trackTitle"></v-list-tile-title>
+                                        <v-list-tile-sub-title v-html="info.trackArtist"></v-list-tile-sub-title>
+                                      </v-list-tile-content>
+                                    </v-list-tile>
+                                  </template>
+                                </v-list>
+                                <span v-else>No results found</span>
+                              </v-card-text>
+
+                              <v-divider></v-divider>
+
+                              <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="blue darken-1" flat @click.native="playlistDialog = false">Close</v-btn>
+                                <v-btn color="blue darken-1" flat @click.native="playlistDialog = false; savePlaylist();">Save to Spotify</v-btn>
+                              </v-card-actions>
+                            </v-card>
+                          </v-dialog>
+                        </v-layout>
+
                       </v-card-text>
-
-                      <v-divider></v-divider>
-
-                      <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1" flat @click.native="playlistDialog = false">Close</v-btn>
-                        <v-btn color="blue darken-1" flat @click.native="playlistDialog = false; savePlaylist();">Save</v-btn>
-                      </v-card-actions>
                     </v-card>
-                  </v-dialog>
-                </v-card> 
-              </v-flex>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+
             </v-layout>
           </v-container>
         </v-content>
