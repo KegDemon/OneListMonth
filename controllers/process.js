@@ -12,9 +12,9 @@ const ProcessController = async request => {
   return seeds && seeds.length > 1 ? makeRequest(seeds, countryCode) : {};
 }
 
-async function makeRequest(seeds, countryCode) {
+async function makeRequest(artistSeeds, countryCode) {
   const req = Request({ params: { country: countryCode } });
-  const artistSeedInformation = seeds.map((artist) =>
+  const artistSeedInformation = artistSeeds.map((artist) =>
     req(`/artists/${artist}/top-tracks`).then((r) => r.data, (e) => e.error)
     , []);
 
@@ -22,7 +22,8 @@ async function makeRequest(seeds, countryCode) {
 
   const getTopTracks = await _requestBatchArtists(artistsTrackCollection);
   const getTrackStyleInformation = await _requestBatchTrackStyles(getTopTracks);
-  const getRecommendations = await _requestRecommendationsFromVitals(getTopTracks, _processVitals(getTrackStyleInformation), countryCode);
+  const getTrackVitals = await _processVitals(getTrackStyleInformation);
+  const getRecommendations = await _requestRecommendationsFromVitals(getTopTracks, artistSeeds, getTrackVitals, countryCode);
 
   return _processFinalTrackList(getRecommendations);
 }
@@ -49,15 +50,19 @@ async function _requestBatchTrackStyles(tracksCollection) {
     .then((r) => _.get(r, 'data.audio_features', {}), (e) => e.error);
 }
 
-async function _requestRecommendationsFromVitals(topTracks, recommendationModel, countryCode) {
-  const req = Request({
-    params: {
-      limit: 100,
-      market: countryCode,
-      seed_tracks: _.sampleSize(topTracks, 5).join(','),
-      ...recommendationModel
-    }
-  });
+async function _requestRecommendationsFromVitals(topTracks, artistSeeds, recommendationModel, countryCode) {
+  const params = {
+    limit: 100,
+    market: countryCode,
+    seed_artists: artistSeeds.join(','),
+    ...recommendationModel
+  };
+
+  if (artistSeeds.length < 5) {
+    params.seed_tracks = _.sampleSize(topTracks, 5 - artistSeeds.length).join(',');
+  }
+
+  const req = Request({ params });
 
   return await req('/recommendations')
     .then(r => r.data, e => e.error);
