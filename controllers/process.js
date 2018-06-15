@@ -60,39 +60,24 @@ async function _requestRecommendationsFromVitals(topTracks, recommendationModel,
 }
 
 async function _processVitals(tracksVitals) {
-  const ret = {};
+  const trackCharacteristics = [
+    'acousticness',
+    'danceability',
+    'energy',
+    'instrumentalness',
+    'key',
+    'liveness',
+    'loudness',
+    'speechiness',
+    'tempo',
+    'valence',
+  ];
 
-  ret.max_danceability = _.maxBy(tracksVitals, (t) => t.danceability).danceability;
-  ret.min_danceability = _.minBy(tracksVitals, (t) => t.danceability).danceability;
-
-  ret.max_energy = _.maxBy(tracksVitals, (t) => t.energy).energy;
-  ret.min_energy = _.minBy(tracksVitals, (t) => t.energy).energy;
-
-  ret.max_key = _.maxBy(tracksVitals, (t) => t.key).key;
-  ret.min_key = _.minBy(tracksVitals, (t) => t.key).key;
-
-  ret.max_loudness = _.maxBy(tracksVitals, (t) => t.loudness).loudness;
-  ret.min_loudness = _.minBy(tracksVitals, (t) => t.loudness).loudness;
-
-  ret.max_speechiness = _.maxBy(tracksVitals, (t) => t.speechiness).speechiness;
-  ret.min_speechiness = _.minBy(tracksVitals, (t) => t.speechiness).speechiness;
-
-  ret.max_acousticness = _.maxBy(tracksVitals, (t) => t.acousticness).acousticness;
-  ret.min_acousticness = _.minBy(tracksVitals, (t) => t.acousticness).acousticness;
-
-  ret.max_instrumentalness = _.maxBy(tracksVitals, (t) => t.instrumentalness).instrumentalness;
-  ret.min_instrumentalness = _.minBy(tracksVitals, (t) => t.instrumentalness).instrumentalness;
-
-  ret.max_liveness = _.maxBy(tracksVitals, (t) => t.liveness).liveness;
-  ret.min_liveness = _.minBy(tracksVitals, (t) => t.liveness).liveness;
-
-  ret.max_valence = _.maxBy(tracksVitals, (t) => t.valence).valence;
-  ret.min_valence = _.minBy(tracksVitals, (t) => t.valence).valence;
-
-  ret.max_tempo = _.maxBy(tracksVitals, (t) => t.tempo).tempo;
-  ret.min_tempo = _.minBy(tracksVitals, (t) => t.tempo).tempo;
-
-  return await ret;
+  return await _.reduce(trackCharacteristics, (res, prop) => {
+    res[`max_${prop}`] = _.maxBy(tracksVitals, (t) => t[prop])[prop];
+    res[`min_${prop}`] = _.minBy(tracksVitals, (t) => t[prop])[prop];
+    return res;
+  }, {});
 }
 
 async function _processFinalTrackList(recommendations) {
