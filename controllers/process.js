@@ -80,8 +80,10 @@ async function _processVitals(tracksVitals) {
     _max = _.maxBy(tracksVitals, (t) => t[prop])[prop] * 100;
     _min = _.minBy(tracksVitals, (t) => t[prop])[prop] * 100;
 
+    const diff = (_max - _min) / 2;
+
     if (
-      trackVarianceMax
+      trackVarianceMax > 0
       && (trackIgnoreVariances.indexOf(prop) < 0)
       && (_max - _min > trackVarianceMax)
     ) {
@@ -89,6 +91,10 @@ async function _processVitals(tracksVitals) {
 
       _max = (_max - varianceToModify);
       _min = (_min + varianceToModify);
+    }
+
+    if ((trackIgnoreVariances.indexOf(prop) < 0)) {
+      res[`target_${prop}`] = +(diff / 100).toFixed(4);
     }
 
     res[`max_${prop}`] = +(_max / 100).toFixed(4);
