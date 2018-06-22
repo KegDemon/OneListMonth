@@ -22,8 +22,12 @@ async function makeRequest(artistSeeds, countryCode) {
 
   const getTopTracks = await _requestBatchArtists(artistsTrackCollection);
   const getTrackStyleInformation = await _requestBatchTrackStyles(getTopTracks);
-  const getTrackVitals = await _processVitals(getTrackStyleInformation);
-  const getRecommendations = await _requestRecommendationsFromVitals(getTopTracks, artistSeeds, getTrackVitals, countryCode);
+  const getRecommendations = await _requestRecommendationsFromVitals(
+    getTopTracks,
+    artistSeeds,
+    _processVitals(getTrackStyleInformation),
+    countryCode
+  );
 
   return _processFinalTrackList(getRecommendations);
 }
@@ -68,12 +72,12 @@ async function _requestRecommendationsFromVitals(topTracks, artistSeeds, recomme
     .then(r => r.data, e => e.error);
 }
 
-async function _processVitals(tracksVitals) {
+function _processVitals(tracksVitals) {
   const trackCharacteristics = env.SPOTIFY_TRACK_CHARACTERISTICS.split(',');
   const trackIgnoreVariances = env.SPOTIFY_TRACK_IGNORE_VARIANCES.split(',');
   const trackVarianceMax = env.SPOTIFY_TRACK_VARIANCE_MAX > 0 ? env.SPOTIFY_TRACK_VARIANCE_MAX : 0;
 
-  return await _.reduce(trackCharacteristics, (res, prop) => {
+  return _.reduce(trackCharacteristics, (res, prop) => {
     let _max = void 0;
     let _min = void 0;
 
