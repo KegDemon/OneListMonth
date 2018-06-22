@@ -32,7 +32,7 @@ new Vue({
 
       if (!val || val.length < 2) {
         this.artistResults = [];
-        return;  
+        return;
       }
 
       this.searchDebounce = setTimeout(() => {
@@ -73,6 +73,8 @@ new Vue({
       axios.post('api/search', { artist: val })
         .then((results) => {
           this.artistResults = results.data;
+          this.searchingArtist = void 0;
+        }, () => {
           this.searchingArtist = void 0;
         });
     }
