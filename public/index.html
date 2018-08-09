@@ -3,9 +3,13 @@
   <head>
     <base href="." />
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <title>OneListMonth</title>
+    <style>
+      /* Vuetify broke input with 100%, fix that with auto */
+      .v-text-field__slot {height: auto;}
+    </style>
   </head>
 
   <body>
@@ -31,7 +35,7 @@
             </v-layout>
 
             <v-layout v-else>
-              <v-toolbar color="primary" dark app absolute>
+              <v-toolbar color="primary" dark app fixed>
                 <span class="display-1 ml-3 mr-5">OneListMonth</span>
               </v-toolbar>
 
@@ -172,8 +176,8 @@
       </v-app>
     </div>
 
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js" integrity="sha256-mpnrJ5DpEZZkwkE1ZgkEQQJW/46CSEh/STrZKOB/qoM=" crossorigin="anonymous"></script>
     <script src="./index.js"></script>
   </body>
