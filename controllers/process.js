@@ -15,8 +15,9 @@ const ProcessController = async request => {
 async function makeRequest(artistSeeds, countryCode) {
   const req = Request({ params: { country: countryCode } });
   const artistSeedInformation = artistSeeds.map((artist) =>
-    req(`/artists/${artist}/top-tracks`).then((r) => r.data, (e) => e.error)
-    , []);
+    req(`/artists/${artist}/top-tracks`).then((r) => r.data, (e) => e.error),
+    []
+  );
 
   const artistsTrackCollection = Promise.all(artistSeedInformation);
 
@@ -29,7 +30,34 @@ async function makeRequest(artistSeeds, countryCode) {
     countryCode
   );
 
-  return _processFinalTrackList(getRecommendations);
+  const results = {...getRecommendations};
+
+  if (env.SPOTIFY_TRACK_GENERATION_ADDITIONS > 0) {
+    for (let i = 0; i < env.SPOTIFY_TRACK_GENERATION_ADDITIONS; ++i) {
+      const _res = await _requestAdditionalTracks(getRecommendations, countryCode);
+      results.tracks.push(..._res);
+    }
+  }
+
+  return _processFinalTrackList(results);
+}
+
+async function _requestAdditionalTracks(recommendations, countryCode) {
+  if ('object' !== typeof recommendations
+    || (!recommendations.tracks && !recommendations.tracks.length)
+  ) return [];
+
+  const bottomResults = recommendations.tracks.slice(-10);
+  const bottomResultsTrackIds = bottomResults.map(track => track.id);
+  const bottomResultsTrackStyles = await _requestBatchTrackStyles(bottomResultsTrackIds).then(_processVitals);
+  const bottomResultsParsed = await _requestRecommendationsFromVitals(
+    bottomResultsTrackIds,
+    [],
+    bottomResultsTrackStyles,
+    countryCode
+  );
+
+  return await bottomResultsParsed.tracks;
 }
 
 async function _requestBatchArtists(artistsTrackCollection) {
@@ -56,7 +84,7 @@ async function _requestBatchTrackStyles(tracksCollection) {
 
 async function _requestRecommendationsFromVitals(topTracks, artistSeeds, recommendationModel, countryCode) {
   const params = {
-    limit: 100,
+    limit: env.SPOTIFY_TRACK_REQUEST_SIZE > 0 ? env.SPOTIFY_TRACK_REQUEST_SIZE : 100,
     market: countryCode,
     seed_artists: artistSeeds.join(','),
     ...recommendationModel
@@ -125,6 +153,7 @@ async function _processFinalTrackList(recommendations) {
 
       return res;
     }, [])
+    .filter('trackUri')
     .value();
 }
 

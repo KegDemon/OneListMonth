@@ -30,7 +30,18 @@ const PlaylistController = async request => {
 
   const _newCreatedPlaylistId = await _putPlaylist(_seedArtists);
 
-  return await _putPlaylistItems(_newCreatedPlaylistId, _trackIds);
+  const _batchedIds = [];
+
+  for (let i = 0, ii = Math.ceil(_trackIds.length / 100); i < ii; ++i) {
+    _batchedIds.push(
+      _putPlaylistItems(
+        _newCreatedPlaylistId,
+        _trackIds.slice(i * 100, (i + 1) * 100)
+      )
+    );
+  }
+
+  return await Promise.all(_batchedIds);
 }
 
 async function _putPlaylist(seedArtists) {
