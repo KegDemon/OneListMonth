@@ -27,21 +27,17 @@ const PlaylistController = async request => {
   if (!_playlist || !_seedArtists || !_uid || !_utoken) return await {data: 'error'};
 
   const _trackIds = _playlist.map((track) => track.trackUri);
-
   const _newCreatedPlaylistId = await _putPlaylist(_seedArtists);
+  const _playlistIterations = Math.ceil(_trackIds.length / 100);
 
-  const _batchedIds = [];
-
-  for (let i = 0, ii = Math.ceil(_trackIds.length / 100); i < ii; ++i) {
-    _batchedIds.push(
-      _putPlaylistItems(
-        _newCreatedPlaylistId,
-        _trackIds.slice(i * 100, (i + 1) * 100)
-      )
+  for (let i = 0; i < _playlistIterations; ++i) {
+    await _putPlaylistItems(
+      _newCreatedPlaylistId,
+      _trackIds.slice(i * 100, (i + 1) * 100)
     );
   }
 
-  return await Promise.all(_batchedIds);
+  return await {data: 'completed'};
 }
 
 async function _putPlaylist(seedArtists) {
