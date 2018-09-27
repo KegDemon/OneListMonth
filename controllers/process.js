@@ -34,7 +34,10 @@ async function makeRequest(artistSeeds, countryCode) {
 
   if (env.SPOTIFY_TRACK_GENERATION_ADDITIONS > 0) {
     for (let i = 0; i < env.SPOTIFY_TRACK_GENERATION_ADDITIONS; ++i) {
-      const _res = await _requestAdditionalTracks(getRecommendations, countryCode);
+      const _res = await _requestAdditionalTracks(
+        !i ? getRecommendations : {tracks: results.tracks.slice(-10)},
+        countryCode
+      );
       results.tracks.push(..._res);
     }
   }
@@ -47,7 +50,7 @@ async function _requestAdditionalTracks(recommendations, countryCode) {
     || (!recommendations.tracks && !recommendations.tracks.length)
   ) return [];
 
-  const bottomResults = recommendations.tracks.slice(-10);
+  const bottomResults = recommendations.tracks;
   const bottomResultsTrackIds = bottomResults.map(track => track.id);
   const bottomResultsTrackStyles = await _requestBatchTrackStyles(bottomResultsTrackIds).then(_processVitals);
   const bottomResultsParsed = await _requestRecommendationsFromVitals(

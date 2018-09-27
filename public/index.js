@@ -31,7 +31,7 @@ new Vue({
       window.clearTimeout(this.searchDebounce);
 
       if (!val || val.length < 2) {
-        this.artistResults = [];
+        this.artistResults = new Array();
         return;
       }
 
@@ -69,12 +69,13 @@ new Vue({
     },
     artistLookup (val) {
       this.searchingArtist = true;
+      this.artistResults = new Array();
 
       axios.post('api/search', { artist: val })
         .then((results) => {
-          this.artistResults = results.data;
-          this.searchingArtist = void 0;
-        }, () => {
+          this.artistResults = [].concat(results.data);
+        })
+        .finally(() => {
           this.searchingArtist = void 0;
         });
     }
