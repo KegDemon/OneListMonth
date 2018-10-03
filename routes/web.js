@@ -4,13 +4,11 @@ const express = require('express');
 const router = express.Router();
 const uuid = require('uuid/v1');
 const axios = require('axios');
-const ctrl = require('../controllers');
-const Request = require('../services').request;
-const btoa = require('btoa');
 
 const userCookieOpts = {
   maxAge: 1000 * 60 * process.env.COOKIE_LOGIN_EXPIRY,
-  httpOnly: true
+  httpOnly: true,
+  secure: process.env.COOKIE_SECURE || false
 };
 
 router.get('/login', (req, res, next) => {
