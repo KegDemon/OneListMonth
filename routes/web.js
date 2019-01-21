@@ -27,7 +27,7 @@ router.get('/auth', (req, res, next) => {
   });
 
   if (!checkXsrf) {
-    res.redirect('https://www.youtube.com/watch?v=6eW_Xw6L05M');
+    res.redirect(process.env.SERVER_ORIGIN);
     return;
   }
 
